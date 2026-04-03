@@ -35,7 +35,7 @@ jobs:
         run: |
           cd server
           go mod download
-          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o jianghu-server ./cmd/server
+          CGO_ENABLED=1 go build -o jianghu-server ./cmd/server
 
       # 构建前端
       - name: Build Frontend
