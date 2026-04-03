@@ -29,7 +29,6 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: '20'
-          cache-dependency-path: app/package-lock.json
 
       # 构建后端
       - name: Build Backend
@@ -42,8 +41,9 @@ jobs:
       - name: Build Frontend
         run: |
           cd app
-          npm ci
-          ./node_modules/.bin/uni build -p h5
+          rm -rf node_modules package-lock.json
+          npm install --legacy-peer-deps
+          npm run build:h5
 
       # 部署到服务器
       - name: Deploy to Server
