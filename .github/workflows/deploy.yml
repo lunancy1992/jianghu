@@ -43,7 +43,7 @@ jobs:
         run: |
           cd app
           npm install
-          npx uni build -p h5
+          ./node_modules/.bin/uni build -p h5
 
       # 部署到服务器
       - name: Deploy to Server
