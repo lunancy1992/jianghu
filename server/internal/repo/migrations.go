@@ -1,0 +1,181 @@
+package repo
+
+var migrationStatements = []string{
+	`CREATE TABLE IF NOT EXISTS users (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		phone TEXT UNIQUE,
+		nickname TEXT NOT NULL DEFAULT '',
+		avatar TEXT NOT NULL DEFAULT '',
+		role TEXT NOT NULL DEFAULT 'user',
+		status INTEGER NOT NULL DEFAULT 0,
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)`,
+
+	`CREATE TABLE IF NOT EXISTS user_verifications (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		phone TEXT NOT NULL,
+		code TEXT NOT NULL,
+		expires_at DATETIME NOT NULL,
+		used INTEGER NOT NULL DEFAULT 0,
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)`,
+	`CREATE INDEX IF NOT EXISTS idx_user_verifications_phone ON user_verifications(phone, used, expires_at)`,
+
+	`CREATE TABLE IF NOT EXISTS user_oauth (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		user_id INTEGER NOT NULL REFERENCES users(id),
+		provider TEXT NOT NULL,
+		provider_id TEXT NOT NULL,
+		union_id TEXT NOT NULL DEFAULT '',
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		UNIQUE(provider, provider_id)
+	)`,
+	`CREATE INDEX IF NOT EXISTS idx_user_oauth_user ON user_oauth(user_id)`,
+
+	`CREATE TABLE IF NOT EXISTS news (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		title TEXT NOT NULL,
+		summary TEXT NOT NULL DEFAULT '',
+		content TEXT NOT NULL DEFAULT '',
+		source TEXT NOT NULL DEFAULT '',
+		source_url TEXT NOT NULL DEFAULT '',
+		author TEXT NOT NULL DEFAULT '',
+		category TEXT NOT NULL DEFAULT '',
+		section TEXT NOT NULL DEFAULT '',
+		keywords TEXT NOT NULL DEFAULT '[]',
+		cover_image TEXT NOT NULL DEFAULT '',
+		sensitivity INTEGER NOT NULL DEFAULT 0,
+		fingerprint TEXT,
+		status INTEGER NOT NULL DEFAULT 0,
+		read_count INTEGER NOT NULL DEFAULT 0,
+		like_count INTEGER NOT NULL DEFAULT 0,
+		comment_count INTEGER NOT NULL DEFAULT 0,
+		published_at DATETIME,
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)`,
+	`CREATE INDEX IF NOT EXISTS idx_news_status ON news(status, published_at DESC)`,
+	`CREATE INDEX IF NOT EXISTS idx_news_category ON news(category, status)`,
+	`CREATE INDEX IF NOT EXISTS idx_news_section ON news(section, status)`,
+	`CREATE INDEX IF NOT EXISTS idx_news_fingerprint ON news(fingerprint)`,
+
+	`CREATE TABLE IF NOT EXISTS headlines (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		news_id INTEGER NOT NULL REFERENCES news(id),
+		rank INTEGER NOT NULL DEFAULT 0,
+		title TEXT NOT NULL DEFAULT '',
+		active_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		expire_at DATETIME NOT NULL,
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)`,
+	`CREATE INDEX IF NOT EXISTS idx_headlines_active ON headlines(active_at, expire_at)`,
+
+	`CREATE TABLE IF NOT EXISTS user_read_marks (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		user_id INTEGER NOT NULL REFERENCES users(id),
+		news_id INTEGER NOT NULL REFERENCES news(id),
+		read_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		UNIQUE(user_id, news_id)
+	)`,
+
+	`CREATE TABLE IF NOT EXISTS comments (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		news_id INTEGER NOT NULL REFERENCES news(id),
+		user_id INTEGER NOT NULL REFERENCES users(id),
+		parent_id INTEGER REFERENCES comments(id),
+		content TEXT NOT NULL,
+		stance TEXT NOT NULL DEFAULT 'neutral',
+		like_count INTEGER NOT NULL DEFAULT 0,
+		status INTEGER NOT NULL DEFAULT 0,
+		audit_note TEXT,
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)`,
+	`CREATE INDEX IF NOT EXISTS idx_comments_news ON comments(news_id, status, created_at DESC)`,
+	`CREATE INDEX IF NOT EXISTS idx_comments_user ON comments(user_id)`,
+	`CREATE INDEX IF NOT EXISTS idx_comments_status ON comments(status)`,
+
+	`CREATE TABLE IF NOT EXISTS likes (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		user_id INTEGER NOT NULL REFERENCES users(id),
+		comment_id INTEGER NOT NULL REFERENCES comments(id),
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		UNIQUE(user_id, comment_id)
+	)`,
+
+	`CREATE TABLE IF NOT EXISTS evidences (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		event_id INTEGER NOT NULL REFERENCES events(id),
+		user_id INTEGER NOT NULL REFERENCES users(id),
+		type TEXT NOT NULL DEFAULT 'image',
+		url TEXT NOT NULL,
+		description TEXT NOT NULL DEFAULT '',
+		status INTEGER NOT NULL DEFAULT 0,
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)`,
+
+	`CREATE TABLE IF NOT EXISTS reports (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		user_id INTEGER NOT NULL REFERENCES users(id),
+		target_type TEXT NOT NULL,
+		target_id INTEGER NOT NULL,
+		reason TEXT NOT NULL,
+		status INTEGER NOT NULL DEFAULT 0,
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)`,
+	`CREATE INDEX IF NOT EXISTS idx_reports_status ON reports(status)`,
+
+	`CREATE TABLE IF NOT EXISTS coin_accounts (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		user_id INTEGER NOT NULL UNIQUE REFERENCES users(id),
+		balance INTEGER NOT NULL DEFAULT 0,
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)`,
+
+	`CREATE TABLE IF NOT EXISTS coin_transactions (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		user_id INTEGER NOT NULL REFERENCES users(id),
+		amount INTEGER NOT NULL,
+		type TEXT NOT NULL,
+		ref_id TEXT NOT NULL DEFAULT '',
+		note TEXT NOT NULL DEFAULT '',
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)`,
+	`CREATE INDEX IF NOT EXISTS idx_coin_tx_user ON coin_transactions(user_id, created_at DESC)`,
+
+	`CREATE TABLE IF NOT EXISTS events (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		title TEXT NOT NULL,
+		description TEXT NOT NULL DEFAULT '',
+		category TEXT NOT NULL DEFAULT '',
+		status TEXT NOT NULL DEFAULT 'ongoing',
+		cover_image TEXT NOT NULL DEFAULT '',
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
+		updated_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)`,
+
+	`CREATE TABLE IF NOT EXISTS event_nodes (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		event_id INTEGER NOT NULL REFERENCES events(id),
+		title TEXT NOT NULL,
+		content TEXT NOT NULL DEFAULT '',
+		node_time DATETIME NOT NULL,
+		source TEXT NOT NULL DEFAULT '',
+		created_at DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP
+	)`,
+	`CREATE INDEX IF NOT EXISTS idx_event_nodes_event ON event_nodes(event_id, node_time)`,
+
+	`CREATE TABLE IF NOT EXISTS event_news (
+		id INTEGER PRIMARY KEY AUTOINCREMENT,
+		event_id INTEGER NOT NULL REFERENCES events(id),
+		news_id INTEGER NOT NULL REFERENCES news(id),
+		UNIQUE(event_id, news_id)
+	)`,
+
+	// v2: add veracity and comment_text fields
+	`ALTER TABLE news ADD COLUMN veracity INTEGER NOT NULL DEFAULT 0`,
+	`ALTER TABLE news ADD COLUMN comment_text TEXT NOT NULL DEFAULT ''`,
+	`ALTER TABLE event_nodes ADD COLUMN veracity INTEGER NOT NULL DEFAULT 0`,
+}

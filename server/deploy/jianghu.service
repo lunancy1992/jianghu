@@ -1,0 +1,14 @@
+[Unit]
+Description=Jianghu Server
+After=network.target
+
+[Service]
+Type=simple
+User=root
+WorkingDirectory=/var/www/jianghuxiaobao/data
+ExecStart=/usr/local/bin/jianghu-server
+Restart=on-failure
+RestartSec=5s
+
+[Install]
+WantedBy=multi-user.target

@@ -1,0 +1,16 @@
+jianghu.example.com {
+    reverse_proxy localhost:8080
+
+    encode gzip
+
+    header {
+        X-Content-Type-Options nosniff
+        X-Frame-Options DENY
+        Referrer-Policy strict-origin-when-cross-origin
+    }
+
+    log {
+        output file /var/log/caddy/jianghu.log
+        format json
+    }
+}

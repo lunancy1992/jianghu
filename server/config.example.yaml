@@ -1,0 +1,34 @@
+server:
+  port: 8080
+  data_dir: ./data
+
+database:
+  path: ./data/jianghu.db
+
+ai:
+  deepseek_api_key: "your-deepseek-api-key"
+  deepseek_base_url: "https://api.deepseek.com"
+  model: "deepseek-chat"
+
+auth:
+  jwt_secret: "your-jwt-secret-here"
+  jwt_expire_hours: 168
+  sms_provider: "stub"           # 线上改为 "aliyun"
+  sms_access_key: ""             # 阿里云 AccessKey ID
+  sms_access_secret: ""          # 阿里云 AccessKey Secret
+  sms_sign_name: ""              # 短信签名，如"江湖小报"
+  sms_template_code: ""          # 短信模板ID，如"SMS_123456789"
+
+crawl:
+  interval_minutes: 30
+  feeds:
+    - name: "36kr"
+      url: "https://36kr.com/feed"
+      enabled: true
+    - name: "zhihu-daily"
+      url: "https://rsshub.app/zhihu/daily"
+      enabled: true
+
+cache:
+  max_cost: 268435456
+  num_counters: 10000000

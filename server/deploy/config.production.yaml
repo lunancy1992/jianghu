@@ -1,0 +1,31 @@
+server:
+  port: 8080
+  data_dir: /var/www/jianghuxiaobao/data
+
+database:
+  path: /var/www/jianghuxiaobao/data/jianghu.db
+
+ai:
+  deepseek_api_key: ""
+  deepseek_base_url: "https://api.deepseek.com"
+  model: "deepseek-chat"
+
+auth:
+  jwt_secret: "CHANGE_THIS_TO_RANDOM_STRING"
+  jwt_expire_hours: 168
+  sms_provider: "stub"
+  sms_access_key: ""
+  sms_access_secret: ""
+  sms_sign_name: ""
+  sms_template_code: ""
+
+crawl:
+  interval_minutes: 30
+  feeds:
+    - name: "36kr"
+      url: "https://36kr.com/feed"
+      enabled: true
+
+cache:
+  max_cost: 268435456
+  num_counters: 10000000
