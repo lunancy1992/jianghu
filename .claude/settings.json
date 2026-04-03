@@ -1,0 +1,8 @@
+{
+  "projectName": "江湖小报",
+  "description": "新闻聚合与事实核查平台 — UniApp 前端 + Go 后端",
+  "directories": {
+    "app": "前端（UniApp + Vue 3）",
+    "server": "后端（Go + Gin）"
+  }
+}

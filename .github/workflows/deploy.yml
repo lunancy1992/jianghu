@@ -1,0 +1,129 @@
+name: Deploy to Aliyun ECS
+
+on:
+  push:
+    branches:
+      - main
+  workflow_dispatch:
+
+env:
+  SERVER_HOST: "47.95.200.127"
+  SERVER_USER: "root"
+  APP_DIR: "/var/www/jianghuxiaobao"
+
+jobs:
+  build-and-deploy:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Setup Go
+        uses: actions/setup-go@v5
+        with:
+          go-version: '1.21'
+          cache-dependency-path: server/go.sum
+
+      - name: Setup Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '18'
+          cache-dependency-path: app/package-lock.json
+
+      # 构建后端
+      - name: Build Backend
+        run: |
+          cd server
+          go mod download
+          CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -o jianghu-server ./cmd/server
+
+      # 构建前端
+      - name: Build Frontend
+        run: |
+          cd app
+          npm install
+          npm run build:h5
+
+      # 部署到服务器
+      - name: Deploy to Server
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            mkdir -p ${{ env.APP_DIR }}/dist
+            mkdir -p ${{ env.APP_DIR }}/data
+            mkdir -p /var/log/jianghu
+
+      - name: Copy Frontend
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "app/dist/build/h5/*"
+          target: "${{ env.APP_DIR }}/dist"
+          strip_components: 4
+
+      - name: Copy Backend
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "server/jianghu-server"
+          target: "/usr/local/bin"
+          strip_components: 1
+
+      - name: Copy Config Files
+        uses: appleboy/scp-action@v0.1.7
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          source: "server/deploy/*"
+          target: "/tmp/jianghu-deploy"
+          strip_components: 2
+
+      - name: Start Services
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.SERVER_HOST }}
+          username: ${{ secrets.SERVER_USER }}
+          key: ${{ secrets.SSH_PRIVATE_KEY }}
+          script: |
+            # 安装配置文件
+            cp /tmp/jianghu-deploy/nginx.conf /etc/nginx/conf.d/jianghuxiaobao.conf
+            cp /tmp/jianghu-deploy/jianghu.service /etc/systemd/system/jianghu-server.service
+
+            # 初始化配置（如果不存在）
+            if [ ! -f /root/jianghu/config.yaml ]; then
+              mkdir -p /root/jianghu
+              cp /tmp/jianghu-deploy/config.production.yaml /root/jianghu/config.yaml
+              # 生成随机 JWT secret
+              sed -i "s/CHANGE_THIS_TO_RANDOM_STRING/$(openssl rand -hex 32)/g" /root/jianghu/config.yaml
+            fi
+
+            # 设置权限
+            chmod +x /usr/local/bin/jianghu-server
+
+            # 重启服务
+            systemctl daemon-reload
+            systemctl enable jianghu-server
+            systemctl restart jianghu-server
+
+            # 重启 Nginx
+            nginx -t && systemctl reload nginx
+
+            # 等待服务启动
+            sleep 3
+
+            # 检查状态
+            systemctl status jianghu-server --no-pager
+
+      - name: Health Check
+        run: |
+          sleep 5
+          curl -f http://${{ secrets.SERVER_HOST }}/health && echo "部署成功！"

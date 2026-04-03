@@ -1,0 +1,48 @@
+# ====== 前端 ======
+app/node_modules/
+app/dist/
+app/unpackage/
+app/.hbuilderx/
+
+# ====== 后端 ======
+server/bin/
+server/data/*.db
+server/data/*.db-journal
+server/config.yaml
+server/jianghu-server
+server/server
+
+# ====== 构建产物 ======
+*.exe
+*.dll
+*.so
+*.dylib
+
+# ====== 配置文件 ======
+config.yaml
+*.local.yaml
+
+# ====== IDE ======
+.idea/
+.vscode/
+*.swp
+*.swo
+
+# ====== OS ======
+.DS_Store
+Thumbs.db
+
+# ====== 日志 ======
+*.log
+logs/
+
+# ====== 测试覆盖率 ======
+coverage.txt
+*.test
+
+# ====== 上传文件 ======
+uploads/
+
+# ====== 临时文件 ======
+tmp/
+tmp

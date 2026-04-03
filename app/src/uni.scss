@@ -1,0 +1,3 @@
+// Variables are injected via vite.config.ts additionalData
+// Do not duplicate the import here as uni.scss is prepended to every component
+// and the relative path './styles/variables.scss' breaks for components in subdirectories

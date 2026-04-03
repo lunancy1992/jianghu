@@ -1,0 +1,203 @@
+/* Global Reset */
+page {
+  font-family: -apple-system, BlinkMacSystemFont, 'Helvetica Neue', 'PingFang SC',
+    'Microsoft YaHei', sans-serif;
+  font-size: $font-size-base;
+  color: $color-text;
+  background-color: $color-bg-secondary;
+  line-height: $line-height-base;
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+view, text, scroll-view {
+  box-sizing: border-box;
+}
+
+/* Typography */
+.text-primary {
+  color: $color-text;
+}
+
+.text-secondary {
+  color: $color-text-secondary;
+}
+
+.text-tertiary {
+  color: $color-text-tertiary;
+}
+
+.text-accent {
+  color: $color-accent;
+}
+
+.text-danger {
+  color: $color-danger;
+}
+
+.text-xs {
+  font-size: $font-size-xs;
+}
+
+.text-sm {
+  font-size: $font-size-sm;
+}
+
+.text-base {
+  font-size: $font-size-base;
+}
+
+.text-lg {
+  font-size: $font-size-lg;
+}
+
+.text-xl {
+  font-size: $font-size-xl;
+}
+
+.text-bold {
+  font-weight: 600;
+}
+
+/* Card styles */
+.card {
+  background-color: $color-bg;
+  border-radius: $radius-sm;
+  padding: $spacing-lg;
+  margin-bottom: 2rpx;
+}
+
+.card-flat {
+  background-color: $color-bg;
+  padding: $spacing-lg;
+  border-bottom: 1rpx solid $color-border;
+}
+
+/* Divider */
+.divider {
+  height: 1rpx;
+  background-color: $color-border;
+  margin: $spacing-md 0;
+}
+
+.divider-thick {
+  height: 16rpx;
+  background-color: $color-bg-secondary;
+}
+
+/* Flex utilities */
+.flex {
+  display: flex;
+}
+
+.flex-col {
+  display: flex;
+  flex-direction: column;
+}
+
+.flex-center {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.flex-between {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+}
+
+.flex-1 {
+  flex: 1;
+}
+
+/* Common button styles */
+.btn {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  height: 80rpx;
+  border-radius: $radius-sm;
+  font-size: $font-size-md;
+  font-weight: 500;
+
+  &-primary {
+    background-color: $color-text;
+    color: $color-bg;
+  }
+
+  &-outline {
+    background-color: transparent;
+    color: $color-text;
+    border: 1rpx solid $color-text;
+  }
+
+  &-ghost {
+    background-color: transparent;
+    color: $color-text-secondary;
+  }
+
+  &-disabled {
+    opacity: 0.4;
+    pointer-events: none;
+  }
+}
+
+/* Safe area bottom */
+.safe-bottom {
+  padding-bottom: constant(safe-area-inset-bottom);
+  padding-bottom: env(safe-area-inset-bottom);
+}
+
+/* Loading & Empty states */
+.loading-text {
+  text-align: center;
+  color: $color-text-tertiary;
+  font-size: $font-size-sm;
+  padding: $spacing-xl 0;
+}
+
+.empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 120rpx $spacing-lg;
+  color: $color-text-tertiary;
+  font-size: $font-size-sm;
+}
+
+/* Dark mode */
+@media (prefers-color-scheme: dark) {
+  page {
+    color: $color-dark-text;
+    background-color: $color-dark-bg;
+  }
+
+  .card {
+    background-color: $color-dark-bg-secondary;
+  }
+
+  .card-flat {
+    background-color: $color-dark-bg-secondary;
+    border-bottom-color: $color-dark-border;
+  }
+
+  .divider {
+    background-color: $color-dark-border;
+  }
+
+  .divider-thick {
+    background-color: $color-dark-bg;
+  }
+
+  .btn-primary {
+    background-color: $color-dark-text;
+    color: $color-dark-bg;
+  }
+
+  .btn-outline {
+    color: $color-dark-text;
+    border-color: $color-dark-text;
+  }
+}
