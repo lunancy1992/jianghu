@@ -28,7 +28,7 @@ jobs:
       - name: Setup Node.js
         uses: actions/setup-node@v4
         with:
-          node-version: '18'
+          node-version: '20'
           cache-dependency-path: app/package-lock.json
 
       # 构建后端
@@ -42,7 +42,7 @@ jobs:
       - name: Build Frontend
         run: |
           cd app
-          npm install
+          npm ci
           ./node_modules/.bin/uni build -p h5
 
       # 部署到服务器
