@@ -33,6 +33,6 @@ coverage.txt
 # Air hot reload
 tmp/
 
-# Uploads
-uploads/
-server
+# Binaries (compiled server binary)
+/server
+jianghu-server
