@@ -6,7 +6,7 @@ import (
 	"testing"
 	"time"
 
-	_ "github.com/mattn/go-sqlite3"
+	_ "modernc.org/sqlite"
 	"github.com/lunancy1992/jianghu-server/internal/config"
 	"github.com/lunancy1992/jianghu-server/internal/repo"
 )
