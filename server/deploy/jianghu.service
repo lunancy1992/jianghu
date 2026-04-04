@@ -10,5 +10,8 @@ ExecStart=/usr/local/bin/jianghu-server
 Restart=on-failure
 RestartSec=5s
 
+# 配置文件路径（相对于 WorkingDirectory）
+Environment="CONFIG_PATH=/root/jianghu/config.yaml"
+
 [Install]
 WantedBy=multi-user.target

@@ -28,8 +28,12 @@ import (
 )
 
 func main() {
-	// Load config
-	cfg, err := config.Load("config.yaml")
+	// Load config - support CONFIG_PATH env var
+	configPath := os.Getenv("CONFIG_PATH")
+	if configPath == "" {
+		configPath = "config.yaml"
+	}
+	cfg, err := config.Load(configPath)
 	if err != nil {
 		log.Fatalf("Failed to load config: %v", err)
 	}
